@@ -6,16 +6,17 @@
 #include <typeindex>
 #include <set>
 
+
 const unsigned int MAX_COMPONENTS = 32;
 typedef std::bitset<MAX_COMPONENTS> Signature;
 
-struct BaseComponent {
+struct IComponent {
 protected:
 	static int nextId;
 };
 
 template <typename T>
-class Component: public BaseComponent {
+class Component: public IComponent {
 	static int GetId() {
 		static auto id = nextId++;
 		return id;
@@ -127,10 +128,6 @@ public:
 	template<typename T> bool HasComponent(Entity entity);
 	template<typename T> T& GetComponent(Entity entity);
 
-
-
-
-
 };
 
 template <typename T>
@@ -139,5 +136,47 @@ void System::RequireComponent() {
 	componentSignature.set(componentId);
 }
 
+template<typename T, typename ...TArgs>
+void Registry::AddComponent(Entity entity, TArgs&& ...args) {
+	const auto componentId = Component<T>::GetId();
+	const auto entityId = entity.GetId();
+
+	if (componentId >= componentPools.size()) {
+		componentPools.resize(componentId + 1, nullptr);
+	}
+
+	if (!componentPools[componentId]) {
+		Pool<T>* newComponentPool = new Pool<T>();
+		componentPools[componentId] = newComponentPool;
+	}
+
+	Pool<T>* componentPool = componentPools[componentId];
+
+	if (entityId > componentPool->GetSize()) {
+		componentPool->Resize(numEntities);
+	}
+
+	T newComponent(std::forward<TArgs>(args)...);
+
+	componentPool->Set(entityId, newComponent);
+
+	entityComponentSignatures[entityId].set(componentId);
+}
+
+template<typename T>
+void Registry::RemoveComponent(Entity entityId) {
+	const auto componentId = Component<T>::GetId();
+	const auto entityId = entity.GetId();
+
+	entityComponentSignatures[entityId].set(componentId, false);
+}
+
+template<typename T>
+bool Registry::HasComponent(Entity entityId) {
+	const auto componentId = Component<T>::GetId();
+	const auto entityId = entity.GetId();
+
+	return entityComponentSignatures[entityId].test(componentId);
+}
 #endif // !ECS_H
 
