@@ -2,6 +2,9 @@
 #define ECS_H
 #include <bitset>
 #include <vector>
+#include <unordered_map>
+#include <typeindex>
+#include <set>
 
 const unsigned int MAX_COMPONENTS = 32;
 typedef std::bitset<MAX_COMPONENTS> Signature;
@@ -101,6 +104,34 @@ private:
 	int numEntities = 0;
 
 	std::vector<IPool*> componentPools;
+
+	std::vector<Signature> entityComponentSignatures;
+
+	std::unordered_map<std::type_index, System*> systems;
+
+	std::set<Entity> entitiesToBeAdded;
+
+	std::set<Entity> entitiesToBeKilled;
+
+public:
+	Registry() = default;
+
+	Entity CreateEntity();
+
+	void Update();
+
+
+	void AddEntityToSystem(Entity entity);
+
+	template<typename T, typename ...TArgs> void AddComponent(Entity entity, TArgs&& ...args);
+	template<typename T> void RemoveComponent(Entity entity);
+	template<typename T> bool HasComponent(Entity entity);
+	template<typename T> T& GetComponent(Entity entity);
+
+
+
+
+
 };
 
 template <typename T>
