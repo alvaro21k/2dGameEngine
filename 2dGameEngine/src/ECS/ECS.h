@@ -120,7 +120,6 @@ public:
 
 	void Update();
 
-
 	void AddEntityToSystem(Entity entity);
 
 	template<typename T, typename ...TArgs> void AddComponent(Entity entity, TArgs&& ...args);

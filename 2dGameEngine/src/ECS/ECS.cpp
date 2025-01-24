@@ -39,3 +39,30 @@ Entity Registry::CreateEntity(){
 void Registry::Update() {
 
 }
+
+template<typename T, typename ...TArgs>
+void AddComponent(Entity entity, TArgs&& ...args) {
+	const auto componentId = Component<T>::GetId();
+	const auto entityId = entity.GetId();
+
+	if (componentId >= componentPools.size()) {
+		componentPools.resize(componentId + 1, nullptr);
+	}
+
+	if (!componentPools[componentId]) {
+		Pool<T>* newComponentPool = new Pool<T>();
+		componentPools[componentId] = newComponentPool;
+	}
+
+	Pool<T>* componentPool = Pool<T>(componentPools[componentId]);
+
+	if (entityId > componentPool->GetSize()) {
+		componentPool->Resize(numEntities);
+	}
+
+	T newComponent(std::forward<TArgs>(args)...);
+
+	componentPool->Set(entityId, newComponent);
+
+	entityComponentSignature[entityId].set(componentId);
+}
