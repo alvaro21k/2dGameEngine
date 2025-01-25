@@ -15,7 +15,7 @@ protected:
 	static int nextId;
 };
 
-template <typename T>
+template <typename TComponent>
 class Component: public IComponent {
 	static int GetId() {
 		static auto id = nextId++;
@@ -123,22 +123,53 @@ public:
 
 	void AddEntityToSystem(Entity entity);
 
-	template<typename T, typename ...TArgs> void AddComponent(Entity entity, TArgs&& ...args);
-	template<typename T> void RemoveComponent(Entity entity);
-	template<typename T> bool HasComponent(Entity entity);
-	template<typename T> T& GetComponent(Entity entity);
+	template<typename TComponent, typename ...TArgs> void AddComponent(Entity entity, TArgs&& ...args);
+	template<typename TComponent> void RemoveComponent(Entity entity);
+	template<typename TComponent> bool HasComponent(Entity entity);
+	template<typename TComponent> TComponent& GetComponent(Entity entity);
+
+	template<typename TSystem, typename ...TArgs> void AddSystem(TArgs&& ...args);
+	template<typename TSystem> void RemoveSystem();
+	template<typename TSystem> bool HasSystem() const;
+	template<typename TSystem> TSystem& GetSystem() const;
+
+	void AddEntityToSystems(Entity entity);
 
 };
 
-template <typename T>
+template <typename TComponent>
 void System::RequireComponent() {
-	const auto componentId = Component<T>::GetId();
+	const auto componentId = Component<TComponent>::GetId();
 	componentSignature.set(componentId);
 }
+template<typename TSystem, typename ...TArgs> 
+void Registry::AddSystem(TArgs&& ...args) {
+	TSystem* newSystem(new TSystem(std::forward<TArgs>(args)...));
 
-template<typename T, typename ...TArgs>
+	systems.insert(std::make_pair(std::type_index(typeid(TSystem)), newSystem));
+}
+
+template<typename TSystem> 
+void Registry::RemoveSystem() {
+	auto system = systems.find(std::type_index(typeid(TSystem)));
+
+	systems.erase(system);
+}
+
+template<typename TSystem> 
+bool Registry::HasSystem() const {
+	return systems.find(std::type_index(typeid(TSystem))) != systems.end();
+}
+
+template<typename TSystem> 
+TSystem& Registry::GetSystem() const {
+	auto system = systems.find(std::type_index(typeid(TSystem)));
+	return *(std::static_pointer_cast<TSystem>(system->second));
+}
+
+template<typename TComponent, typename ...TArgs>
 void Registry::AddComponent(Entity entity, TArgs&& ...args) {
-	const auto componentId = Component<T>::GetId();
+	const auto componentId = Component<TComponent>::GetId();
 	const auto entityId = entity.GetId();
 
 	if (componentId >= componentPools.size()) {
@@ -146,34 +177,34 @@ void Registry::AddComponent(Entity entity, TArgs&& ...args) {
 	}
 
 	if (!componentPools[componentId]) {
-		Pool<T>* newComponentPool = new Pool<T>();
+		Pool<TComponent>* newComponentPool = new Pool<TComponent>();
 		componentPools[componentId] = newComponentPool;
 	}
 
-	Pool<T>* componentPool = componentPools[componentId];
+	Pool<TComponent>* componentPool = componentPools[componentId];
 
 	if (entityId > componentPool->GetSize()) {
 		componentPool->Resize(numEntities);
 	}
 
-	T newComponent(std::forward<TArgs>(args)...);
+	TComponent newComponent(std::forward<TArgs>(args)...);
 
 	componentPool->Set(entityId, newComponent);
 
 	entityComponentSignatures[entityId].set(componentId);
 }
 
-template<typename T>
+template<typename TComponent>
 void Registry::RemoveComponent(Entity entityId) {
-	const auto componentId = Component<T>::GetId();
+	const auto componentId = Component<TComponent>::GetId();
 	const auto entityId = entity.GetId();
 
 	entityComponentSignatures[entityId].set(componentId, false);
 }
 
-template<typename T>
+template<typename TComponent>
 bool Registry::HasComponent(Entity entityId) {
-	const auto componentId = Component<T>::GetId();
+	const auto componentId = Component<TComponent>::GetId();
 	const auto entityId = entity.GetId();
 
 	return entityComponentSignatures[entityId].test(componentId);
