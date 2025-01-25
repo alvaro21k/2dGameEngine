@@ -8,8 +8,8 @@
 
 Game::Game() {
 	isRunning = false;
-	registry = new Registry();
-	Logger::Log("Game constructor ff called");
+	registry = std::make_unique<Registry>();
+	Logger::Log("Game constructor called");
 }
 
 Game::~Game() {
