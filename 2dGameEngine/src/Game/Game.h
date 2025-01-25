@@ -1,6 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include "../ECS/ECS.h"
 #include <SDL.h>
 
 const int FPS = 60;
@@ -14,6 +15,8 @@ private:
 
 	SDL_Window* window;
 	SDL_Renderer* renderer;
+
+	Registry* registry;
 public:
 	Game();
 	~Game();

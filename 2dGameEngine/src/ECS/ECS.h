@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <typeindex>
 #include <set>
+#include <memory>
 
 
 const unsigned int MAX_COMPONENTS = 32;
@@ -31,7 +32,11 @@ public:
 	Entity(int id): id(id) {}
 	int GetId() const;
 
+	Entity& operator =(const Entity& other) = default;
 	bool operator ==(const Entity& other) const { return id == other.id; }
+	bool operator !=(const Entity& other) const { return id != other.id; }
+	bool operator >(const Entity& other) const { return id > other.id; }
+	bool operator <(const Entity& other) const { return id < other.id; }
 };
 
 class System {
@@ -92,7 +97,7 @@ public:
 	}
 
 	T& Get(int index) {
-		return static_cast<T&>data[index];
+		return static_cast<T&>(data[index]);
 	}
 
 	T& operator [](unsigned int index) {
@@ -195,7 +200,7 @@ void Registry::AddComponent(Entity entity, TArgs&& ...args) {
 }
 
 template<typename TComponent>
-void Registry::RemoveComponent(Entity entityId) {
+void Registry::RemoveComponent(Entity entity) {
 	const auto componentId = Component<TComponent>::GetId();
 	const auto entityId = entity.GetId();
 
@@ -203,7 +208,7 @@ void Registry::RemoveComponent(Entity entityId) {
 }
 
 template<typename TComponent>
-bool Registry::HasComponent(Entity entityId) {
+bool Registry::HasComponent(Entity entity) {
 	const auto componentId = Component<TComponent>::GetId();
 	const auto entityId = entity.GetId();
 
