@@ -5,6 +5,9 @@
 #include <SDL_image.h>
 #include <glm/glm.hpp>
 #include <iostream>
+#include "../Components/TransformComponent.h"
+#include "../Components/RigidBodyComponent.h"
+#include "../Systems/MovementSystem.h"
 
 Game::Game() {
 	isRunning = false;
@@ -53,9 +56,13 @@ void Game::Initialize() {
 
 
 void Game::Setup() {
+	registry->AddSystem<MovementSystem>();
+
 	Entity tank = registry->CreateEntity();
-	Entity truck = registry->CreateEntity();
+	//Entity truck = registry->CreateEntity();
 	
+	tank.AddComponent<TransformComponent>(glm::vec2(10.0, 30.0), glm::vec2(1.0, 1.0), 0.0);
+	tank.AddComponent<RigidBodyComponent>(glm::vec2(50.0, 0.0));
 }
 
 void Game::Run() {
@@ -97,7 +104,9 @@ void Game::Update() {
 
 	millisecsPreviousFrame = SDL_GetTicks();
 	
-	//MovementSystem.Update();
+	registry->GetSystem<MovementSystem>().Update(deltaTime);
+
+	registry->Update();
 }
 
 

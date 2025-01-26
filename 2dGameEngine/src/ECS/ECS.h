@@ -6,6 +6,7 @@
 #include <typeindex>
 #include <set>
 #include <memory>
+#include "../Logger/Logger.h"
 
 
 const unsigned int MAX_COMPONENTS = 32;
@@ -18,6 +19,7 @@ protected:
 
 template <typename TComponent>
 class Component: public IComponent {
+public:
 	static int GetId() {
 		static auto id = nextId++;
 		return id;
@@ -37,6 +39,13 @@ public:
 	bool operator !=(const Entity& other) const { return id != other.id; }
 	bool operator >(const Entity& other) const { return id > other.id; }
 	bool operator <(const Entity& other) const { return id < other.id; }
+
+	template<typename TComponent, typename ...TArgs> void AddComponent(TArgs&& ...args);
+	template<typename TComponent> void RemoveComponent();
+	template<typename TComponent> bool HasComponent();
+	template<typename TComponent> TComponent& GetComponent();
+
+	class Registry* registry;
 };
 
 class System {
@@ -120,7 +129,12 @@ private:
 	std::set<Entity> entitiesToBeKilled;
 
 public:
-	Registry() = default;
+	Registry() { Logger::Log("Registry constructor called");
+	}
+
+	~Registry() { Logger::Log("Registry destructor called"); 
+	}
+
 
 	Entity CreateEntity();
 
@@ -195,6 +209,8 @@ void Registry::AddComponent(Entity entity, TArgs&& ...args) {
 	componentPool->Set(entityId, newComponent);
 
 	entityComponentSignatures[entityId].set(componentId);
+
+	Logger::Log("Component id = " + std::to_string(componentId) + " was added to entity id " + std::to_string(entityId));
 }
 
 template<typename TComponent>
@@ -203,6 +219,9 @@ void Registry::RemoveComponent(Entity entity) {
 	const auto entityId = entity.GetId();
 
 	entityComponentSignatures[entityId].set(componentId, false);
+
+	Logger::Log("Component id = " + std::to_string(componentId) + " was removed to entity id " + std::to_string(entityId));
+
 }
 
 template<typename TComponent>
@@ -211,6 +230,35 @@ bool Registry::HasComponent(Entity entity) {
 	const auto entityId = entity.GetId();
 
 	return entityComponentSignatures[entityId].test(componentId);
+}
+
+template<typename TComponent> 
+TComponent& Registry::GetComponent(Entity entity) {
+	const auto componentId = Component<TComponent>::GetId();
+	const auto entityId = entity.GetId();
+
+	auto componentPool = std::static_pointer_cast<Pool<TComponent>>(componentPools[componentId]);
+	return componentPool->Get(entityId);
+}
+
+template<typename TComponent, typename ...TArgs> 
+void Entity::AddComponent(TArgs&& ...args) {
+	registry->AddComponent<TComponent>(*this,std::forward<TArgs>(args)...);
+}
+
+template<typename TComponent> 
+void Entity::RemoveComponent() {
+	registry->RemoveComponent<TComponent>(*this);
+}
+
+template<typename TComponent> 
+bool Entity::HasComponent() {
+	return registry->HasComponent<TComponent>(*this);
+}
+
+template<typename TComponent> 
+TComponent& Entity::GetComponent() {
+	return registry->GetComponent<TComponent>(*this);
 }
 #endif // !ECS_H
 
