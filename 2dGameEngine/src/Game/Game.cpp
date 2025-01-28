@@ -14,9 +14,11 @@
 #include "../Systems/RenderSystem.h"
 #include "../Systems/AnimationSystem.h"
 #include "../Systems/CollisionSystem.h"
+#include "../Systems/RenderCollisionSystem.h"
 
 Game::Game() {
 	isRunning = false;
+	isDebug = false;
 	registry = std::make_unique<Registry>();
 	assetStore = std::make_unique<AssetStore>();
 	Logger::Log("Game constructor called");
@@ -66,6 +68,7 @@ void Game::LoadLevel(int level) {
 	registry->AddSystem<RenderSystem>();
 	registry->AddSystem<AnimationSystem>();
 	registry->AddSystem<CollisionSystem>();
+	registry->AddSystem<RenderCollisionSystem>();
 
 	assetStore->AddTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
 	assetStore->AddTexture(renderer, "truck-image", "./assets/images/truck-ford-right.png");
@@ -147,6 +150,10 @@ void Game::ProcessInput() {
 				if (sdlEvent.key.keysym.sym == SDLK_ESCAPE) {
 					isRunning = false;
 				}
+
+				if (sdlEvent.key.keysym.sym == SDLK_d) {
+					isDebug = !isDebug;
+				}
 				break;
 		}
 	}
@@ -181,6 +188,7 @@ void Game::Render() {
 	SDL_RenderClear(renderer);
 
 	registry->GetSystem<RenderSystem>().Update(renderer, assetStore);
+	registry->GetSystem<RenderCollisionSystem>().Update(renderer, isDebug);
 
 	SDL_RenderPresent(renderer);
 }

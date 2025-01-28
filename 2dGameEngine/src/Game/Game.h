@@ -13,6 +13,7 @@ class Game
 {
 private:
 	bool isRunning;
+	bool isDebug;
 	int millisecsPreviousFrame = 0;
 
 	SDL_Window* window;
