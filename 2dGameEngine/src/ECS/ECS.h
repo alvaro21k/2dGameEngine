@@ -6,6 +6,7 @@
 #include <typeindex>
 #include <set>
 #include <memory>
+#include <deque>
 #include "../Logger/Logger.h"
 
 
@@ -33,6 +34,8 @@ private:
 public:
 	Entity(int id): id(id) {}
 	int GetId() const;
+
+	void Kill();
 
 	Entity& operator =(const Entity& other) = default;
 	bool operator ==(const Entity& other) const { return id == other.id; }
@@ -128,6 +131,8 @@ private:
 
 	std::set<Entity> entitiesToBeKilled;
 
+	std::deque<int> freeIds;
+
 public:
 	Registry() { Logger::Log("Registry constructor called");
 	}
@@ -135,8 +140,11 @@ public:
 	~Registry() { Logger::Log("Registry destructor called"); 
 	}
 
-
+	
 	Entity CreateEntity();
+	void KillEntity(Entity entity);
+
+	
 
 	void Update();
 
@@ -151,6 +159,7 @@ public:
 	template<typename TSystem> TSystem& GetSystem() const;
 
 	void AddEntityToSystems(Entity entity);
+	void RemoveEntityFromSystems(Entity entity);
 
 };
 
