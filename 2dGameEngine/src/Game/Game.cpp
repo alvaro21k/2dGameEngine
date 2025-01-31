@@ -14,13 +14,17 @@
 #include "../Systems/RenderSystem.h"
 #include "../Systems/AnimationSystem.h"
 #include "../Systems/CollisionSystem.h"
+#include "../Systems/DamageSystem.h"
 #include "../Systems/RenderCollisionSystem.h"
+#include "../Systems/KeyboardMovementSystem.h"
+#include "../Events/KeyPressedEvent.h"
 
 Game::Game() {
 	isRunning = false;
 	isDebug = false;
 	registry = std::make_unique<Registry>();
 	assetStore = std::make_unique<AssetStore>();
+	eventBus = std::make_unique<EventBus>();
 	Logger::Log("Game constructor called");
 }
 
@@ -69,6 +73,8 @@ void Game::LoadLevel(int level) {
 	registry->AddSystem<AnimationSystem>();
 	registry->AddSystem<CollisionSystem>();
 	registry->AddSystem<RenderCollisionSystem>();
+	registry->AddSystem<DamageSystem>();
+	registry->AddSystem<KeyboardMovementSystem>();
 
 	assetStore->AddTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
 	assetStore->AddTexture(renderer, "truck-image", "./assets/images/truck-ford-right.png");
@@ -148,6 +154,7 @@ void Game::ProcessInput() {
 				break;
 
 			case SDL_KEYDOWN:
+				
 				if (sdlEvent.key.keysym.sym == SDLK_ESCAPE) {
 					isRunning = false;
 				}
@@ -155,6 +162,8 @@ void Game::ProcessInput() {
 				if (sdlEvent.key.keysym.sym == SDLK_d) {
 					isDebug = !isDebug;
 				}
+
+				eventBus->EmitEvent<KeyPressedEvent>(sdlEvent.key.keysym.sym);
 				break;
 		}
 	}
@@ -173,12 +182,19 @@ void Game::Update() {
 
 	millisecsPreviousFrame = SDL_GetTicks();
 	
+	//Reset all event handlers for the current frame
+	eventBus->Reset();
 
+	//Event subscrition
+	registry->GetSystem<DamageSystem>().SubscribeToEvents(eventBus);
+	registry->GetSystem<KeyboardMovementSystem>().SubscribeToEvents(eventBus);
+
+	//Updates
 	registry->Update();
 
 	registry->GetSystem<MovementSystem>().Update(deltaTime);
 	registry->GetSystem<AnimationSystem>().Update();
-	registry->GetSystem<CollisionSystem>().Update();
+	registry->GetSystem<CollisionSystem>().Update(eventBus);
 
 	
 }

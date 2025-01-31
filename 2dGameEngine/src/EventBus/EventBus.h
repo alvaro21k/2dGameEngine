@@ -44,6 +44,7 @@ public:
 
 typedef std::list<std::unique_ptr<IEventCallback>> HandlerList;
 
+
 class EventBus {
 private:
 	std::map<std::type_index, std::unique_ptr<HandlerList>> subscribers;
@@ -56,12 +57,17 @@ public:
 		Logger::Log("EventBus destructor called");
 	}
 
+	//Clears the subscriber list
+	void Reset() {
+		subscribers.clear();
+	}
+
 	//Subscribe to an event type <T>
 	//Example: eventBus->SubscribeToEvent<CollisionEvent>(this, &Game::onCollision);
 	template <typename TEvent, typename TOwner>
 	void SubscribeToEvent(TOwner* ownerInstance, void (TOwner::*callbackFunction)(TEvent&)) {
-		if (!subscribers[typeId(TEvent)].get()) {
-			subscribers[typeId(TEvent)] = std::make_unique<HandlerList>();
+		if (!subscribers[typeid(TEvent)].get()) {
+			subscribers[typeid(TEvent)] = std::make_unique<HandlerList>();
 		}
 		auto subscriber = std::make_unique<EventCallback<TOwner, TEvent>>(ownerInstance, callbackFunction);
 		subscribers[typeid(TEvent)]->push_back(std::move(subscriber));
@@ -71,7 +77,7 @@ public:
 	//Example: eventBus->EmitEvent<CollisionEvent>(player, enemy);
 	template <typename TEvent, typename ...TArgs>
 	void EmitEvent(TArgs&& ...args) {
-		auto handlers = subscribers[typeId(TEvent)].get();
+		auto handlers = subscribers[typeid(TEvent)].get();
 		if (handlers) {
 			for (auto it = handlers->begin(); it != handlers->end(); it++) {
 				auto handler = it->get();
