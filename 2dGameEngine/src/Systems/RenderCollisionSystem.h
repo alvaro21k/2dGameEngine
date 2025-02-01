@@ -25,8 +25,8 @@ public:
 			SDL_Rect colliderRect = {
 				static_cast<int>(transform.position.x + collider.offset.x - camera.x),
 				static_cast<int>(transform.position.y + collider.offset.y - camera.y),
-				static_cast<int>(collider.width),
-				static_cast<int>(collider.height)
+				static_cast<int>(collider.width * transform.scale.x),
+				static_cast<int>(collider.height * transform.scale.y)
 			};
 
 	
