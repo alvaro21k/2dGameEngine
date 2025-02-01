@@ -19,6 +19,7 @@ private:
 
 	SDL_Window* window;
 	SDL_Renderer* renderer;
+	SDL_Rect camera;
 
 	std::unique_ptr<Registry> registry;
 	std::unique_ptr<AssetStore> assetStore;
@@ -36,8 +37,10 @@ public:
 	void Render();
 	void Destroy();
 
-	int windowWidth;
-	int windowHeigth;
+	static int windowWidth;
+	static int windowHeigth;
+	static int mapWidth;
+	static int mapHeight;
 };
 
 
