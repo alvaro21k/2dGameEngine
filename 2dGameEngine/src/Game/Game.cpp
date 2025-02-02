@@ -199,7 +199,7 @@ void Game::ProcessInput() {
 				}
 
 				//Player movement and key pressed is processed here
-				eventBus->EmitEvent<KeyPressedEvent>(sdlEvent.key.keysym.sym);
+				eventBus->EmitEvent<KeyPressedEvent>(sdlEvent.key.keysym.sym, camera);
 				break;
 		}
 	}

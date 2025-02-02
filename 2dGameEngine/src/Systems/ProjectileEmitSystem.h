@@ -34,7 +34,10 @@ public:
 					auto projectileEmitter = entity.GetComponent<ProjectileEmitterComponent>();
 					auto transform = entity.GetComponent<TransformComponent>();
 
-					glm::vec2 projectilePosition = transform.position;
+					glm::vec2 projectilePosition;
+					projectilePosition.x = transform.position.x ;
+					projectilePosition.y = transform.position.y ;
+
 					if (entity.HasComponent<SpriteComponent>()) {
 						auto sprite = entity.GetComponent<SpriteComponent>();
 
@@ -58,7 +61,7 @@ public:
 					Entity projectile = entity.registry->CreateEntity();
 					projectile.AddComponent<TransformComponent>(projectilePosition, glm::vec2(1.0, 1.0), 0);
 					projectile.AddComponent<RigidBodyComponent>(projectileVelocity);
-					projectile.AddComponent<SpriteComponent>("bullet-image", 4, 4, 4);
+					projectile.AddComponent<SpriteComponent>("bullet-image", 4, 4, 4, true);
 					projectile.AddComponent<BoxColliderComponent>(4, 4);
 					projectile.AddComponent<ProjectileComponent>(projectileEmitter.isFriendly, projectileEmitter.hitPercentDamage, projectileEmitter.projectileDuration);
 

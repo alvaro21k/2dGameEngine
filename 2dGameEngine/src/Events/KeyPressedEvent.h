@@ -9,7 +9,8 @@
 class KeyPressedEvent : public Event {
 public:
 	SDL_Keycode symbol;
-	KeyPressedEvent(SDL_Keycode symbol) : symbol(symbol) {
+	SDL_Rect camera;
+	KeyPressedEvent(SDL_Keycode symbol, SDL_Rect camera) : symbol(symbol), camera(camera) {
 
 	}
 
