@@ -16,7 +16,7 @@ void Entity::Tag(const std::string& tag) {
 }
 
 bool Entity::HasTag(const std::string& tag) const {
-	registry->EntityHasTag(*this, tag);
+	return registry->EntityHasTag(*this, tag);
 }
 
 void Entity::Group(const std::string& group) {
@@ -24,7 +24,7 @@ void Entity::Group(const std::string& group) {
 }
 
 bool Entity::BelongsToGroup(const std::string& group) const {
-	registry->EntityBelongsToGroup(*this, group);
+	return registry->EntityBelongsToGroup(*this, group);
 }
 
 void System::AddEntityToSystem(Entity entity) {
@@ -127,8 +127,29 @@ void Registry::GroupEntity(Entity entity, const std::string& group) {
 }
 
 bool Registry::EntityBelongsToGroup(Entity entity, const std::string& group) const {
-	auto groupEntities = entitiesPerGroup()
+	auto groupEntities = entitiesPerGroup.at(group);
+	return groupEntities.find(entity.GetId()) != groupEntities.end();
 }
+
+void Registry::RemoveEntityGroup(Entity entity) {
+	auto groupedEntity = groupPerEntity.find(entity.GetId());
+	if (groupedEntity != groupPerEntity.end()) {
+		auto group = entitiesPerGroup.find(groupedEntity->second);
+		if (group != entitiesPerGroup.end()) {
+			auto entityInGroup = group->second.find(entity);
+			if (entityInGroup != group->second.end()) {
+				group->second.erase(entityInGroup);
+			}
+		}
+		groupPerEntity.erase(groupedEntity);
+	}
+}
+
+std::vector<Entity> Registry::GetEntitiesByGroup(const std::string& group) const {
+	auto& setOfEntities = entitiesPerGroup.at(group);
+	return std::vector<Entity>(setOfEntities.begin(), setOfEntities.end());
+}
+
 
 void Registry::Update() {
 
@@ -143,6 +164,9 @@ void Registry::Update() {
 
 
 		freeIds.push_back(entity.GetId());
+
+		RemoveEntityTag(entity);
+		RemoveEntityGroup(entity);
 	}
 	entitiesToBeKilled.clear();
 }
