@@ -75,7 +75,7 @@ void Game::Initialize() {
 		return;
 	}
 
-	//SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
+	SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
 
 	//Initialize the camera view with the entire screen area
 	camera.x = 0;
@@ -108,7 +108,7 @@ void Game::LoadLevel(int level) {
 
 	// Create the background map
 	int tileSize = 32;
-    double tileScale = 2.5;
+    double tileScale = 4;
     int mapNumCols = 25;
     int mapNumRows = 20;
 
