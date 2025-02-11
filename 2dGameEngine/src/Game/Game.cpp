@@ -105,6 +105,7 @@ void Game::LoadLevel(int level) {
 	assetStore->AddTexture(renderer, "chopper-image", "./assets/images/chopper-spritesheet.png");
 	assetStore->AddTexture(renderer, "tilemap-image", "./assets/tilemaps/jungle.png");
 	assetStore->AddTexture(renderer, "bullet-image", "./assets/images/bullet.png");
+	assetStore->AddFont("charriot-font", "./assets/fonts/charriot.ttf", 14);
 
 	// Create the background map
 	int tileSize = 32;
