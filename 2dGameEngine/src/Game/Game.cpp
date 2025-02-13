@@ -116,6 +116,8 @@ void Game::LoadLevel(int level) {
 	assetStore->AddTexture(renderer, "tilemap-image", "./assets/tilemaps/jungle.png");
 	assetStore->AddTexture(renderer, "bullet-image", "./assets/images/bullet.png");
 	assetStore->AddFont("charriot-font20", "./assets/fonts/charriot.ttf", 20);
+	assetStore->AddFont("arial-font5", "./assets/fonts/arial.ttf", 5);
+	assetStore->AddFont("arial-font10", "./assets/fonts/arial.ttf", 10);
 
 	// Create the background map
 	int tileSize = 32;
@@ -184,7 +186,7 @@ void Game::LoadLevel(int level) {
 
 	Entity label = registry->CreateEntity();
 	SDL_Color white = { 255,255,255 };
-	label.AddComponent<TextLabelComponent>(glm::vec2(windowWidth/2 - 40, 10), "THIS IS A TEXT LABEL!!", "charriot-font20", white, true);
+	label.AddComponent<TextLabelComponent>(glm::vec2(windowWidth/2 - 40, 10), "CHOPPER 1.0", "charriot-font20", white, true);
 }
 
 void Game::Setup() {
@@ -267,6 +269,7 @@ void Game::Render() {
 	//Render in window
 	registry->GetSystem<RenderSystem>().Update(renderer, assetStore, camera);
 	registry->GetSystem<RenderTextSystem>().Update(renderer, assetStore, camera);
+	registry->GetSystem<RenderHealthBarSystem>().Update(renderer, assetStore, camera);
 
 	if (isDebug) {
 		registry->GetSystem<RenderCollisionSystem>().Update(renderer, camera);
