@@ -4,6 +4,9 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <glm/glm.hpp>
+#include <imgui/imgui.h>
+#include <imgui/imgui_sdl.h>
+#include <imgui/imgui_impl_sdl.h>
 #include <iostream>
 #include <fstream>
 #include "../Components/TransformComponent.h"
@@ -83,7 +86,11 @@ void Game::Initialize() {
 		return;
 	}
 
-	SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
+	//SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
+
+	//Initialize ImGUI context
+	ImGui::CreateContext();
+	ImGuiSDL::Initialize(renderer, windowWidth, windowHeigth);
 
 	//Initialize the camera view with the entire screen area
 	camera.x = 0;
@@ -205,6 +212,18 @@ void Game::Run() {
 void Game::ProcessInput() {
 	SDL_Event sdlEvent;
 	while (SDL_PollEvent(&sdlEvent)) {
+		//Process ImGUI SDL events
+		ImGui_ImplSDL2_ProcessEvent(&sdlEvent);
+
+		ImGuiIO& io = ImGui::GetIO();
+
+		int mouseX, mouseY;
+		const int buttons = SDL_GetMouseState(&mouseX, &mouseY);
+
+		io.MousePos = ImVec2(mouseX, mouseY);
+		io.MouseDown[0] = buttons & SDL_BUTTON(SDL_BUTTON_LEFT);
+		io.MouseDown[1] = buttons & SDL_BUTTON(SDL_BUTTON_RIGHT);
+		//Process sdl events
 		switch (sdlEvent.type) {
 			case SDL_QUIT:
 				isRunning = false;
@@ -272,6 +291,10 @@ void Game::Render() {
 	registry->GetSystem<RenderHealthBarSystem>().Update(renderer, assetStore, camera);
 
 	if (isDebug) {
+		ImGui::NewFrame();
+		ImGui::ShowDemoWindow();
+		ImGui::Render();
+		ImGuiSDL::Render(ImGui::GetDrawData());
 		registry->GetSystem<RenderCollisionSystem>().Update(renderer, camera);
 	}
 	
@@ -280,6 +303,8 @@ void Game::Render() {
 }
 
 void Game::Destroy() {
+	ImGuiSDL::Deinitialize();
+	ImGui::DestroyContext();
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
