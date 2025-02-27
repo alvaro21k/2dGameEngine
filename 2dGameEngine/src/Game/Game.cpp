@@ -30,6 +30,7 @@
 #include "../Systems/ProjectileLifecycleSystem.h"
 #include "../Systems/RenderTextSystem.h"
 #include "../Systems/RenderHealthBarSystem.h"
+#include "../Systems/RenderGUISystem.h"
 #include "../Events/KeyPressedEvent.h"
 
 int Game::windowHeigth;
@@ -114,6 +115,7 @@ void Game::LoadLevel(int level) {
 	registry->AddSystem<ProjectileLifecycleSystem>();
 	registry->AddSystem<RenderTextSystem>();
 	registry->AddSystem<RenderHealthBarSystem>();
+	registry->AddSystem<RenderGUISystem>();
 
 	// Add textures to our asset store
 	assetStore->AddTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
@@ -291,14 +293,11 @@ void Game::Render() {
 	registry->GetSystem<RenderHealthBarSystem>().Update(renderer, assetStore, camera);
 
 	if (isDebug) {
-		ImGui::NewFrame();
-		ImGui::ShowDemoWindow();
-		ImGui::Render();
-		ImGuiSDL::Render(ImGui::GetDrawData());
 		registry->GetSystem<RenderCollisionSystem>().Update(renderer, camera);
+
+		registry->GetSystem<RenderGUISystem>().Update(registry);
 	}
 	
-
 	SDL_RenderPresent(renderer);
 }
 

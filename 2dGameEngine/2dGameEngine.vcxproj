@@ -421,6 +421,7 @@
     <ClInclude Include="src\Systems\ProjectileEmitSystem.h" />
     <ClInclude Include="src\Systems\ProjectileLifecycleSystem.h" />
     <ClInclude Include="src\Systems\RenderCollisionSystem.h" />
+    <ClInclude Include="src\Systems\RenderGUISystem.h" />
     <ClInclude Include="src\Systems\RenderHealthBarSystem.h" />
     <ClInclude Include="src\Systems\RenderSystem.h" />
     <ClInclude Include="src\Systems\RenderTextSystem.h" />

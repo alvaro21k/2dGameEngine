@@ -78,16 +78,7 @@ void FlappyBird::Setup()
 
 void FlappyBird::LoadLevel(int level)
 {
-	switch (level) {
-	case 1:
-		//Load introduction scene
 
-	case 2:
-		//Load main game scene
-
-	case 3:
-		//Load game over scene
-	}
 }
 
 void FlappyBird::ProcessInput()
