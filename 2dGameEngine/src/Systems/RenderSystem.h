@@ -38,7 +38,7 @@ public:
 				);
 
 
-			if (isEntityOutsideCameraView) {
+			if (isEntityOutsideCameraView && !renderableEntity.spriteComponent.isFixed) {
 				continue;
 			}
 			entitiesToRender.emplace_back(static_cast<RenderableEntity>(renderableEntity));

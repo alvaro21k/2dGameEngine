@@ -69,12 +69,13 @@ public:
 				transform.position.y = transform.position.y > Game::mapWidth - paddingBottom ? Game::mapWidth - paddingBottom : transform.position.y;
 			}
 
+			int margin = 100;
 
 			bool isEntityOutsideMap = (
-				transform.position.x < 0 ||
-				transform.position.x > Game::mapWidth ||
-				transform.position.y < 0 ||
-				transform.position.y > Game::mapHeight
+				transform.position.x < -margin ||
+				transform.position.x > Game::mapWidth + margin ||
+				transform.position.y < -margin ||
+				transform.position.y > Game::mapHeight + margin
 				);
 
 			if (isEntityOutsideMap && !entity.HasTag("player")) {
