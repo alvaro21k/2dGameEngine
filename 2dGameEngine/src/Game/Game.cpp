@@ -64,8 +64,8 @@ void Game::Initialize() {
 
 	SDL_DisplayMode displayMode;
 	SDL_GetCurrentDisplayMode(0, &displayMode);
-	windowWidth = displayMode.w;
-	windowHeigth = displayMode.h;
+	windowWidth = 1920; //displayMode.w;
+	windowHeigth = 1080; // displayMode.h;
 	window = SDL_CreateWindow(
 		NULL, 
 		SDL_WINDOWPOS_CENTERED, 
@@ -131,7 +131,7 @@ void Game::LoadLevel(int level) {
 
 	// Create the background map
 	int tileSize = 32;
-    double tileScale = 4;
+    double tileScale = 2;
     int mapNumCols = 25;
     int mapNumRows = 20;
 
