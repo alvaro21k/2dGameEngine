@@ -411,6 +411,7 @@
     <ClInclude Include="src\Events\KeyPressedEvent.h" />
     <ClInclude Include="src\Game\FlappyBird.h" />
     <ClInclude Include="src\Game\Game.h" />
+    <ClInclude Include="src\Game\LevelLoader.h" />
     <ClInclude Include="src\Logger\Logger.h" />
     <ClInclude Include="src\Systems\AnimationSystem.h" />
     <ClInclude Include="src\Systems\CameraMovementSystem.h" />
@@ -572,6 +573,7 @@
     <ClCompile Include="src\ECS\ECS.cpp" />
     <ClCompile Include="src\Game\FlappyBird.cpp" />
     <ClCompile Include="src\Game\Game.cpp" />
+    <ClCompile Include="src\Game\LevelLoader.cpp" />
     <ClCompile Include="src\Logger\Logger.cpp" />
     <ClCompile Include="src\Main.cpp" />
   </ItemGroup>
