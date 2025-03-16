@@ -5,6 +5,7 @@
 #include "../AssetStore/AssetStore.h"
 #include "../EventBus/EventBus.h"
 #include <SDL.h>
+#include <sol/sol.hpp>
 
 
 const int FPS = 60;
@@ -21,9 +22,12 @@ private:
 	SDL_Renderer* renderer;
 	SDL_Rect camera;
 
+	sol::state lua;
+
 	std::unique_ptr<Registry> registry;
 	std::unique_ptr<AssetStore> assetStore;
 	std::unique_ptr<EventBus> eventBus;
+
 
 public:
 	Game();
